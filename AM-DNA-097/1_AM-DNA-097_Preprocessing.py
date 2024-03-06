@@ -1,6 +1,6 @@
 '''
 Author: BL
-Last_date_modified: 2022.07.13
+Last_date_modified: 2023.07.13
 Purpose: To run the AM-DNA-097 (TLS_120h_Rep1) dataset through Cassiopeia preprocessing and tree reconstruction.
 
 Returns:
@@ -46,7 +46,7 @@ umi_table_aligned.to_csv(output_dir + 'umi_table_aligned.txt', sep = '\t', index
 umi_table = umi_table_aligned.copy()
 umi_table = umi_table[["readName","AlignmentScore","CIGAR","QueryBegin","ReferenceBegin","Seq","UMI","cellBC","readCount"]]
 umi_table.reset_index(inplace=True)
-
+Cassiopeia/
 # This function compares the indel cutsites to the CIGAR strings of each alignment and produces a dataFrame mapping for each
 umi_table_alleles = cas.pp.call_alleles(umi_table, ref_filepath = reference_filepath, barcode_interval = (21, 35), cutsite_locations = [113, 167, 221], cutsite_width = 12, context = True, context_size = 0)
 umi_table_alleles.to_csv(output_dir + 'umi_table_alleles.txt', sep='\t', index = False)

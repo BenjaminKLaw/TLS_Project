@@ -1,7 +1,7 @@
 '''
 Author: BL
 Last_date_modified: 2022.07.13
-Purpose: To run the AM-DNA-097 (TLS_120h_Rep1) dataset through Cassiopeia preprocessing and tree reconstruction.
+Purpose: To run the AM-DNA-098 (TLS_120h_Rep2) dataset through Cassiopeia preprocessing and tree reconstruction.
 
 For best results, this script was run using the Argo-comp2 cluster
 
@@ -82,8 +82,8 @@ total_table = remove_NaN(total_table)
 # Calculate the priors using each intBC / Multiseq Barcode as a different indel instance
 total_priors = cas.pp.compute_empirical_indel_priors(total_table, grouping_variables=['intBC', 'finalCalls'])
 
-def hybrid_tree_pipeline(table, name, total_priors, best_seed):
-    character_matrix, priors, state_2_indel = cas.pp.convert_alleletable_to_character_matrix(tableFiltered, allele_rep_thresh = 1, mutation_priors = total_priors)  
+def hybrid_tree_pipeline(table, name, total_priors, best_seed, output):
+    character_matrix, priors, state_2_indel = cas.pp.convert_alleletable_to_character_matrix(table, allele_rep_thresh = 1, mutation_priors = total_priors)  
 
     character_matrix.to_csv(output + name + '_character_matrix.txt', sep = '\t')
 
@@ -99,7 +99,7 @@ def hybrid_tree_pipeline(table, name, total_priors, best_seed):
     uncut_proportion = (character_matrix == 0).sum(axis = 0) / character_matrix.shape[0]
     n_unique_states = character_matrix.apply(lambda x: len(np.unique(x[(x != 0) & (x != -1)])), axis = 0)
 
-    cell_meta = tableFiltered.groupby('cellBC').agg({"intBC": 'nunique', 'UMI': 'sum', 'cell_state': 'unique'})
+    cell_meta = table.groupby('cellBC').agg({"intBC": 'nunique', 'UMI': 'sum', 'cell_state': 'unique'})
     character_meta = pd.DataFrame([missing_proportion, uncut_proportion, n_unique_states], index = ['missing_prop', 'uncut_prop', 'n_unique_states']).T
 
     cas_tree.cell_meta = cell_meta
@@ -131,4 +131,4 @@ tableFiltered.to_csv(output + 'allele_table_filtered.txt', sep='\t', index = Fal
 tableFiltered = remove_NaN(tableFiltered)
 
 # The hybrid seed study showed that the seed 222 created the tree with the highest likelihood
-hybrid_tree_pipeline(tableFiltered, name, total_priors, best_seed)
+hybrid_tree_pipeline(tableFiltered, name, total_priors, best_seed, output)
